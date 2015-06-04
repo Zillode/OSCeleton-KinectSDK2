@@ -1,0 +1,45 @@
+﻿<Window x:Class="Microsoft.Samples.Kinect.FaceBasics.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OSCeleton-KinectSDK2" 
+        Height="768" Width="1024" 
+        Loaded="MainWindow_Loaded"
+        Closing="MainWindow_Closing"
+        KeyUp="MainWindow_KeyUp">
+    <Window.Resources>
+        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
+        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
+        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
+    </Window.Resources>
+    <Grid Margin="10 0 10 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Image Grid.Row="0" Source="Images\Logo.png" HorizontalAlignment="Left" Stretch="Fill" Height="32" Width="81" Margin="0 10 0 5" />
+        <TextBlock Grid.Row="0" Margin="0,0,3,33" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">OSCeleton-KinectSDK2</TextBlock>
+        <Image Grid.Row="0" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5" />
+
+        <Viewbox Grid.Row="1" HorizontalAlignment="Center">
+            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
+
+        <StatusBar Grid.Row="2" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
+            <StatusBarItem Content="{Binding StatusText}" />
+        </StatusBar>
+
+        <CheckBox Grid.Row="2" Content="Show Skeleton" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,11,0,19" x:Name="checkBoxShowSkeleton" Checked="CheckBoxShowSkeletonChanged" Unchecked="CheckBoxShowSkeletonChanged" IsChecked="True"/>
+        <CheckBox Grid.Row="2" Content="Track Face" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="123,11,0,19" x:Name="checkBoxTrackFace" Checked="CheckBoxTrackFaceChanged" Unchecked="CheckBoxTrackFaceChanged"/>
+        <CheckBox Grid.Row="2" Content="Speech Commands" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="222,11,0,19" x:Name="checkBoxSpeechCommands" Checked="CheckBoxSpeechCommandsChanged" Unchecked="CheckBoxSpeechCommandsChanged"/>
+        <TextBlock x:Name="helpbox" Margin="0,41,3,10" Width="666" HorizontalAlignment="Right" TextAlignment="Right"><Run Text="Press space to store the gesture in a new file."/></TextBlock>
+        <ComboBox x:Name="ComboBoxDisplay" HorizontalAlignment="Right" Margin="0,10,3,12" Width="65" HorizontalContentAlignment="Right" VerticalContentAlignment="Stretch" Grid.Row="2" SelectionChanged="ComboBoxDisplaySelectionChanged" SelectedIndex="2">
+            <ComboBoxItem Content="None"/>
+            <ComboBoxItem Content="RGB"/>
+            <ComboBoxItem Content="Depth"/>
+            <ComboBoxItem Content="IR"/>
+        </ComboBox>
+    </Grid>
+
+</Window>
