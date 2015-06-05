@@ -199,20 +199,20 @@ namespace OSCeleton
             trackingInformationQueue.Add(new BodyTrackingInformation(sensorId, user, b, fullBody, getTime()));
         }
 
-        double detectionResultToConfidence(DetectionResult r)
+        float detectionResultToConfidence(DetectionResult r)
         {
             switch (r)
             {
                 case DetectionResult.Unknown:
-                    return 0.5;
+                    return 0.5f;
                 case DetectionResult.Maybe:
-                    return 0.5;
+                    return 0.5f;
                 case DetectionResult.No:
-                    return 0;
+                    return 0f;
                 case DetectionResult.Yes:
-                    return 1;
+                    return 1f;
                 default:
-                    return 0.5;
+                    return 0.5f;
             }
         }
 

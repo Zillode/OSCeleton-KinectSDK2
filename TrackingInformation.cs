@@ -149,10 +149,10 @@ namespace OSCeleton
     
     public class FacePropertyTrackingInformation : TrackingInformation {
         int user;
-        double happy, engaged, wearingGlasses, leftEyeClosed, rightEyeClosed, mouthOpen, mouthMoved, lookingAway;
+        float happy, engaged, wearingGlasses, leftEyeClosed, rightEyeClosed, mouthOpen, mouthMoved, lookingAway;
         double time;
-        public FacePropertyTrackingInformation(int sensorId, int user, double happy, double engaged, double wearingGlasses,
-            double leftEyeClosed, double rightEyeClosed, double mouthOpen, double mouthMoved, double lookingAway, double time) {
+        public FacePropertyTrackingInformation(int sensorId, int user, float happy, float engaged, float wearingGlasses,
+            float leftEyeClosed, float rightEyeClosed, float mouthOpen, float mouthMoved, float lookingAway, double time) {
             this.sensorId = sensorId;
             this.user = user;
             this.happy = happy;
