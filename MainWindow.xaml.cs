@@ -1312,9 +1312,36 @@ namespace Microsoft.Samples.Kinect.FaceBasics
             UpdateObservers();
         }
 
+        private void initFaceDB()
+        {
+            // Copy NUIDatabase
+            string source = Environment.GetEnvironmentVariable("KINECTSDK20_DIR");
+            if (source == null)
+            {
+                MessageBox.Show("KINECTSDK20_DIR environment variable not found. Please install Kinect SDK v2.0", "OSCeleton-KinectSD2 dependency error");
+                Application.Current.Shutdown();
+                return;
+            }
+            System.Uri uri = new Uri(System.Reflection.Assembly.GetAssembly(typeof(MainWindow)).CodeBase);
+            string target = Path.GetDirectoryName(uri.LocalPath);
+            Process proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = @"C:\WINDOWS\system32\xcopy.exe",
+                    Arguments = "\"" + source + "\\Redist\\Face\\x64\\NuiDatabase\" \"" + target + "\\NuiDatabase\" /S /R /Y /I",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = false,
+                    CreateNoWindow = true
+                }
+            };
+            proc.Start();
+            proc.WaitForExit();
+        }
 
         private void initOSCeleton()
         {
+            initFaceDB();
             this.osceleton.Initialise();
             this.depthFrameDescription = this.kinectSensor.DepthFrameSource.FrameDescription;
             this.displayDepthWidth = depthFrameDescription.Width;
