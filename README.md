@@ -14,6 +14,11 @@ This version of OSCeleton is similar to [OSCeleton-OpenNI](http://github.com/Zil
 How do I use it?
 ----------------
 
+Download and install the [ClickOnce installer](http://osceleton.zillode.be/private/osceleton-kinectsdk2/setup.exe)
+
+How do I build it?
+------------------
+
 ### Install Visual Studio 2013
 ### Install [Microsoft Kinect SDK (version 2.0)](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
 ### Install [Microsoft Speech Platform SDK (version 11)](http://www.microsoft.com/en-us/download/details.aspx?id=27226)
@@ -39,7 +44,7 @@ The messages will have the following format:
     f: Y coordinate of joint in real world coordinates (centimers)
     f: Z coordinate of joint in real world coordinates (centimers)
     f: confidence value in interval [0.0, 1.0]
-	d: timestamp in milliseconds since launch
+	d: timestamp in milliseconds since Unix epoch
 
 Note: the Y coordinate is inverted compared to the default KinectSDK to be compatible with OpenNI.
 
@@ -47,13 +52,13 @@ Note: the Y coordinate is inverted compared to the default KinectSDK to be compa
 The messages will have the following format:
 
     Address pattern: "/osceleton2/face_rotation"
-    Type tag: "iiffffd"
+    Type tag: "iifffd"
     i: The ID of the sensor
     i: The ID of the user
     f: pitch of the head [-90, 90]
-    f: pitch of the yaw [-90, 90]
-    f: pitch of the roll [-90, 90]
-	d: timestamp in milliseconds since launch
+    f: yaw of the head [-90, 90]
+    f: roll of the head [-90, 90]
+	d: timestamp in milliseconds since Unix epoch
 	
 Further information about the FaceRotation properties can be found [here](https://msdn.microsoft.com/en-us/library/microsoft.kinect.face.faceframeresult.facerotationquaternion.aspx)
 
@@ -61,7 +66,7 @@ Further information about the FaceRotation properties can be found [here](https:
 The messages will have the following format:
 
     Address pattern: "/osceleton2/face_property"
-    Type tag: "iiffffd"
+    Type tag: "iiffffffffd"
     i: The ID of the sensor
     i: The ID of the user
     f: happy [0, 1]
@@ -72,7 +77,7 @@ The messages will have the following format:
     f: mouth open [0, 1]
     f: mouth moved [0, 1]
     f: looking away [0, 1]
-	d: timestamp in milliseconds since launch
+	d: timestamp in milliseconds since Unix epoch
 
 Further information about the Face properties can be found [here](https://msdn.microsoft.com/en-us/library/microsoft.kinect.face.faceproperty.aspx)
 

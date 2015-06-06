@@ -14,7 +14,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("OSCeleton-KinectSDK2")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("OSCeleton-KinectSDK2")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersionAttribute("1.0.0.0")]
@@ -53,3 +53,6 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")][assembly: NeutralResourcesLanguageAttribute("en-US")]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: CLSCompliant(true)]
+[assembly: AssemblyCompanyAttribute("Zillode")]
+[assembly: AssemblyProductAttribute("OSCeleton-KinectSDK2")]
+[assembly: AssemblyCopyrightAttribute("Copyright © Zillode 2015")]
