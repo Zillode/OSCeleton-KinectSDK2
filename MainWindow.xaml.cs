@@ -1033,7 +1033,7 @@ namespace Microsoft.Samples.Kinect.FaceBasics
         private void Reader_FrameArrived(object sender, DepthFrameArrivedEventArgs e)
         {
             bool depthFrameProcessed = false;
-
+            if (showMode != showModes.Depth) return;
             using (DepthFrame depthFrame = e.FrameReference.AcquireFrame())
             {
                 if (depthFrame != null)
@@ -1116,6 +1116,7 @@ namespace Microsoft.Samples.Kinect.FaceBasics
             {
                 if (infraredFrame != null)
                 {
+                    if (showMode != showModes.IR) return;
                     // the fastest way to process the infrared frame data is to directly access 
                     // the underlying buffer
                     using (Microsoft.Kinect.KinectBuffer infraredBuffer = infraredFrame.LockImageBuffer())
@@ -1206,6 +1207,16 @@ namespace Microsoft.Samples.Kinect.FaceBasics
                 StartSpeechRecognizer();
             else
                 StopSpeechRecognizer();
+        }
+
+        /// <summary>
+        /// Handles changes to the hands only checkbox
+        /// </summary>
+        /// <param name="sender">object sending the event</param>
+        /// <param name="e">event arguments</param>
+        private void CheckBoxTrackHandsOnlyChanged(object sender, System.Windows.RoutedEventArgs e)
+        {
+            osceleton.SwitchHandsOnly(this.checkBoxTrackHandsOnly.IsChecked.Value);
         }
 
         /// <summary>
@@ -1346,6 +1357,8 @@ namespace Microsoft.Samples.Kinect.FaceBasics
             this.depthFrameDescription = this.kinectSensor.DepthFrameSource.FrameDescription;
             this.displayDepthWidth = depthFrameDescription.Width;
             this.displayDepthHeight = depthFrameDescription.Height;
+            this.checkBoxTrackHandsOnly.IsChecked = osceleton.GetHandsOnly();
+            this.checkBoxTrackFace.IsChecked = osceleton.GetFaceTracking();
             UpdateObservers();
         }
 

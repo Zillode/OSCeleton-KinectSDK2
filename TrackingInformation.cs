@@ -11,14 +11,14 @@ namespace OSCeleton
     abstract public class TrackingInformation
     {
         public int sensorId;
-        public abstract void Send(UdpWriter osc, StreamWriter fileWriter, int pointScale);
+        public abstract void Send(int pointScale, UdpWriter osc, StreamWriter fileWriter);
     }
 
     public class BodyTrackingInformation : TrackingInformation {
 
         public int user;
         public Body body;
-        public bool fullBody;
+        public bool handsOnly;
         public double time;
 
         public static List<String> oscMapping = new List<String> { "",
@@ -28,54 +28,65 @@ namespace OSCeleton
             "l_hip", "l_knee", "l_ankle", "l_foot",
             "r_hip", "r_knee", "r_ankle", "r_foot" };
 
-        public BodyTrackingInformation(int sensorId, int user, Body body, bool fullBody, double time)
+        public BodyTrackingInformation(int sensorId, int user, Body body, bool handsOnly, double time)
         {
             this.sensorId = sensorId;
             this.user = user;
             this.body = body;
-            this.fullBody = fullBody;
+            this.handsOnly = handsOnly;
             this.time = time;
         }
 
-        public override void Send(UdpWriter osc, StreamWriter fileWriter, int pointScale)
+        public override void Send(int pointScale, UdpWriter osc, StreamWriter fileWriter)
         {
             if (body == null) return;
-            if (body.Joints == null || body.Joints.Count < 20) return;
-            if (body.JointOrientations == null || body.JointOrientations.Count < 20) return;
+            if (body.Joints == null) return;
+            if (body.Joints.Count < 20) return;
+            if (body.JointOrientations == null) return;
+            if (body.JointOrientations.Count < 20) return;
             if (!body.IsTracked) return;
-            if (!fullBody)
+            try
             {
-                ProcessJointInformation(15, body.Joints[JointType.HandRight], body.JointOrientations[JointType.HandRight], time, osc, fileWriter, pointScale);
-            }
-            else
-            {
-                ProcessJointInformation(1, body.Joints[JointType.Head], body.JointOrientations[JointType.Head], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(2, body.Joints[JointType.SpineShoulder], body.JointOrientations[JointType.SpineShoulder], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(3, body.Joints[JointType.SpineMid], body.JointOrientations[JointType.SpineMid], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(4, body.Joints[JointType.SpineBase], body.JointOrientations[JointType.SpineBase], time, osc, fileWriter, pointScale);
-                // ProcessJointInformation(5, body.Joints[JointType.], body.JointOrientations[JointType.], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(6, body.Joints[JointType.ShoulderLeft], body.JointOrientations[JointType.ShoulderLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(7, body.Joints[JointType.ElbowLeft], body.JointOrientations[JointType.ElbowLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(8, body.Joints[JointType.WristLeft], body.JointOrientations[JointType.WristLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(9, body.Joints[JointType.HandLeft], body.JointOrientations[JointType.HandLeft], time, osc, fileWriter, pointScale);
-                // ProcessJointInformation(10, body.Joints[JointType.], body.JointOrientations[JointType.], time, osc, fileWriter, pointScale);
-                // ProcessJointInformation(11, body.Joints[JointType.], body.JointOrientations[JointType.], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(12, body.Joints[JointType.ShoulderRight], body.JointOrientations[JointType.ShoulderRight], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(13, body.Joints[JointType.ElbowRight], body.JointOrientations[JointType.ElbowRight], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(14, body.Joints[JointType.WristRight], body.JointOrientations[JointType.WristRight], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(15, body.Joints[JointType.HandRight], body.JointOrientations[JointType.HandRight], time, osc, fileWriter, pointScale);
-                // ProcessJointInformation(16, body.Joints[JointType.], body.JointOrientations[JointType.], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(17, body.Joints[JointType.HipLeft], body.JointOrientations[JointType.HipLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(18, body.Joints[JointType.KneeLeft], body.JointOrientations[JointType.KneeLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(19, body.Joints[JointType.AnkleLeft], body.JointOrientations[JointType.AnkleLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(20, body.Joints[JointType.FootLeft], body.JointOrientations[JointType.FootLeft], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(21, body.Joints[JointType.HipRight], body.JointOrientations[JointType.HipRight], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(22, body.Joints[JointType.KneeRight], body.JointOrientations[JointType.KneeRight], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(23, body.Joints[JointType.AnkleRight], body.JointOrientations[JointType.AnkleRight], time, osc, fileWriter, pointScale);
-                ProcessJointInformation(24, body.Joints[JointType.FootRight], body.JointOrientations[JointType.FootRight], time, osc, fileWriter, pointScale);
+                if (handsOnly)
+                {
+                    ProcessHandStateInformation(1, body.Joints[JointType.HandLeft], body.JointOrientations[JointType.HandLeft], body.HandLeftState, body.HandLeftConfidence, time, pointScale, osc, fileWriter);
+                    ProcessHandStateInformation(2, body.Joints[JointType.HandRight], body.JointOrientations[JointType.HandRight], body.HandRightState, body.HandRightConfidence, time, pointScale, osc, fileWriter);
+                }
+                else
+                {
+                    ProcessJointInformation(1, body.Joints[JointType.Head], body.JointOrientations[JointType.Head], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(2, body.Joints[JointType.SpineShoulder], body.JointOrientations[JointType.SpineShoulder], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(3, body.Joints[JointType.SpineMid], body.JointOrientations[JointType.SpineMid], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(4, body.Joints[JointType.SpineBase], body.JointOrientations[JointType.SpineBase], time, pointScale, osc, fileWriter);
+                    // ProcessJointInformation(5, body.Joints[JointType.], body.JointOrientations[JointType.], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(6, body.Joints[JointType.ShoulderLeft], body.JointOrientations[JointType.ShoulderLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(7, body.Joints[JointType.ElbowLeft], body.JointOrientations[JointType.ElbowLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(8, body.Joints[JointType.WristLeft], body.JointOrientations[JointType.WristLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(9, body.Joints[JointType.HandLeft], body.JointOrientations[JointType.HandLeft], time, pointScale, osc, fileWriter);
+                    // ProcessJointInformation(10, body.Joints[JointType.], body.JointOrientations[JointType.], time, pointScale, osc, fileWriter);
+                    // ProcessJointInformation(11, body.Joints[JointType.], body.JointOrientations[JointType.], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(12, body.Joints[JointType.ShoulderRight], body.JointOrientations[JointType.ShoulderRight], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(13, body.Joints[JointType.ElbowRight], body.JointOrientations[JointType.ElbowRight], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(14, body.Joints[JointType.WristRight], body.JointOrientations[JointType.WristRight], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(15, body.Joints[JointType.HandRight], body.JointOrientations[JointType.HandRight], time, pointScale, osc, fileWriter);
+                    // ProcessJointInformation(16, body.Joints[JointType.], body.JointOrientations[JointType.], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(17, body.Joints[JointType.HipLeft], body.JointOrientations[JointType.HipLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(18, body.Joints[JointType.KneeLeft], body.JointOrientations[JointType.KneeLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(19, body.Joints[JointType.AnkleLeft], body.JointOrientations[JointType.AnkleLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(20, body.Joints[JointType.FootLeft], body.JointOrientations[JointType.FootLeft], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(21, body.Joints[JointType.HipRight], body.JointOrientations[JointType.HipRight], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(22, body.Joints[JointType.KneeRight], body.JointOrientations[JointType.KneeRight], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(23, body.Joints[JointType.AnkleRight], body.JointOrientations[JointType.AnkleRight], time, pointScale, osc, fileWriter);
+                    ProcessJointInformation(24, body.Joints[JointType.FootRight], body.JointOrientations[JointType.FootRight], time, pointScale, osc, fileWriter);
+
+                    ProcessHandStateInformation(1, body.Joints[JointType.HandLeft], body.JointOrientations[JointType.HandLeft], body.HandLeftState, body.HandLeftConfidence, time, pointScale, osc, fileWriter);
+                    ProcessHandStateInformation(2, body.Joints[JointType.HandRight], body.JointOrientations[JointType.HandRight], body.HandRightState, body.HandRightConfidence, time, pointScale, osc, fileWriter);
+                }
+            } catch (NullReferenceException ex) {
+                // Happens sometimes. Probably because we should copy body before processing it in another thread.
+                Console.WriteLine(ex.Message);
             }
         }
-
 
         double JointToConfidenceValue(Joint j)
         {
@@ -85,15 +96,44 @@ namespace OSCeleton
             return 0.5;
         }
 
-        void ProcessJointInformation(int joint, Joint j, JointOrientation jo, double time, UdpWriter osc, StreamWriter fileWriter, int pointScale)
+        void ProcessJointInformation(int joint, Joint j, JointOrientation jo, double time, int pointScale, UdpWriter osc, StreamWriter fileWriter)
         {
+            if (j == null) return;
+            if (jo == null) return;
             SendJointMessage(joint,
                 j.Position.X, j.Position.Y, j.Position.Z,
                 JointToConfidenceValue(j), time,
-                osc, fileWriter, pointScale);
+                pointScale, osc, fileWriter);
         }
 
-        void SendJointMessage(int joint, double x, double y, double z, double confidence, double time, UdpWriter osc, StreamWriter fileWriter, int pointScale)
+        int HandStateToValue(HandState hs)
+        {
+            if (hs == HandState.Open) return 1;
+            if (hs == HandState.Closed) return 2;
+            if (hs == HandState.Lasso) return 3;
+            if (hs == HandState.Unknown) return 4;
+            if (hs == HandState.NotTracked) return 5;
+            return 6;
+        }
+
+        double TrackingConfidenceToValue(TrackingConfidence c)
+        {
+            if (c == TrackingConfidence.High) return 1;
+            if (c == TrackingConfidence.Low) return 0;
+            return 0.5;
+        }
+
+        void ProcessHandStateInformation(int joint, Joint j, JointOrientation jo, HandState state, TrackingConfidence confidence, double time, int pointScale, UdpWriter osc, StreamWriter fileWriter)
+        {
+            SendHandStateMessage(joint,
+                j.Position.X, j.Position.Y, j.Position.Z,
+                JointToConfidenceValue(j),
+                HandStateToValue(state),
+                TrackingConfidenceToValue(confidence), time,
+                pointScale, osc, fileWriter);
+        }
+
+        void SendJointMessage(int joint, double x, double y, double z, double confidence, double time, int pointScale, UdpWriter osc, StreamWriter fileWriter)
         {
             if (osc != null)
             {
@@ -101,12 +141,34 @@ namespace OSCeleton
             }
             if (fileWriter != null)
             {
-                // Joint, user, joint, x, y, z, on
+                // Joint, user, joint, x, y, z, confidence, time
                 fileWriter.WriteLine("Joint," + sensorId + "," + user + "," + joint + "," +
                     (x * pointScale).ToString().Replace(",", ".") + "," +
                     (-y * pointScale).ToString().Replace(",", ".") + "," +
                     (z * pointScale).ToString().Replace(",", ".") + "," +
                     confidence.ToString().Replace(",", ".") + "," +
+                    time.ToString().Replace(",", "."));
+            }
+        }
+
+        void SendHandStateMessage(int hand, double x, double y, double z, double confidence, int state, double stateConfidence, double time, int pointScale, UdpWriter osc, StreamWriter fileWriter)
+        {
+            if (osc != null)
+            {
+                osc.Send(new OscElement("/osceleton2/hand", sensorId, user, hand,
+                    (float)(x * pointScale), (float)(-y * pointScale), (float)(z * pointScale), (float)confidence,
+                    state, (float)stateConfidence, time));
+            }
+            if (fileWriter != null)
+            {
+                // Hand, user, joint, x, y, z, confidence, state, stateConfidence, time
+                fileWriter.WriteLine("Hand," + sensorId + "," + user + "," + hand + "," +
+                    (x * pointScale).ToString().Replace(",", ".") + "," +
+                    (-y * pointScale).ToString().Replace(",", ".") + "," +
+                    (z * pointScale).ToString().Replace(",", ".") + "," +
+                    confidence.ToString().Replace(",", ".") + "," +
+                    state + "," +
+                    stateConfidence.ToString().Replace(",", ".") + "," +
                     time.ToString().Replace(",", "."));
             }
         }
@@ -127,7 +189,7 @@ namespace OSCeleton
             this.time = time;
         }
 
-        public override void Send(UdpWriter osc, StreamWriter fileWriter, int pointScale)
+        public override void Send(int pointScale, UdpWriter osc, StreamWriter fileWriter)
         {
             if (osc != null)
             {
@@ -166,7 +228,7 @@ namespace OSCeleton
             this.time = time;
         }
         
-            public override void Send(UdpWriter osc, StreamWriter fileWriter, int pointScale)
+            public override void Send(int pointScale, UdpWriter osc, StreamWriter fileWriter)
             {
                 if (osc != null)
                 {

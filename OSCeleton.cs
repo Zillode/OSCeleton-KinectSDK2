@@ -20,10 +20,10 @@ namespace OSCeleton
 
         // Settings
         private bool allUsers = true;
-        private bool fullBody = true;
+        private bool handsOnly = true;
         private bool faceTracking = false;
         private bool writeOSC = true;
-        private bool writeCSV = true;
+        private bool writeCSV = false;
         private bool useUnixEpochTime = true;
         private String oscHost = "127.0.0.1";
         private int oscPort = 7110;
@@ -49,7 +49,7 @@ namespace OSCeleton
             {
                 args[index] = args[index].ToLower();
                 if ("allUsers".ToLower().Equals(args[index])) allUsers = StringToBool(args[index + 1]);
-                if ("fullBody".ToLower().Equals(args[index])) fullBody = StringToBool(args[index + 1]);
+                if ("handsOnly".ToLower().Equals(args[index])) handsOnly = StringToBool(args[index + 1]);
                 if ("faceTracking".ToLower().Equals(args[index])) faceTracking = StringToBool(args[index + 1]);
                 if ("writeOSC".ToLower().Equals(args[index])) writeOSC = StringToBool(args[index + 1]);
                 if ("writeCSV".ToLower().Equals(args[index])) writeCSV = StringToBool(args[index + 1]);
@@ -93,6 +93,21 @@ namespace OSCeleton
             }
         }
 
+        public bool GetHandsOnly()
+        {
+            return handsOnly;
+        }
+
+        public void SwitchHandsOnly(bool handsOnly)
+        {
+            this.handsOnly = handsOnly;
+        }
+
+        public bool GetFaceTracking()
+        {
+            return faceTracking;
+        }
+
         public void OpenNewCSVFile()
         {
             if (!writeCSV) return;
@@ -116,6 +131,7 @@ namespace OSCeleton
         {
             StreamWriter fileWriter = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/points-MSK2-" + getUnixEpochTime().ToString().Replace(",", ".") + ".csv", false);
             fileWriter.WriteLine("Joint, sensor, user, joint, x, y, z, confidence, time");
+            fileWriter.WriteLine("HandState, sensor, user, joint, x, y, z, confidence, state, stateConfidence, time");
             fileWriter.WriteLine("Face, sensor, user, pitch, yaw, roll, time");
             fileWriter.WriteLine("FaceProperty, sensor, user, happy, engaged, wearingGlasses, leftEyeClosed, rightEyeClosed, mouthOpen, mouthMoved, lookingAway, time");
             return fileWriter;
@@ -202,7 +218,7 @@ namespace OSCeleton
         {
             if (!capturing) { return; }
             if (b == null) { return; }
-            trackingInformationQueue.Add(new BodyTrackingInformation(sensorId, user, b, fullBody, getTime()));
+            trackingInformationQueue.Add(new BodyTrackingInformation(sensorId, user, b, handsOnly, getTime()));
         }
 
         float detectionResultToConfidence(DetectionResult r)
@@ -258,9 +274,18 @@ namespace OSCeleton
             {
                 TrackingInformation i = trackingInformationQueue.Take();
                 if (i != null && capturing)
-                lock (fileWriter)
                 {
-                        i.Send(osc, fileWriter, pointScale);
+                    if (fileWriter != null)
+                    {
+                        lock (fileWriter)
+                        {
+                            i.Send(pointScale, osc, fileWriter);
+                        }
+                    }
+                    else
+                    {
+                        i.Send(pointScale, osc, fileWriter);
+                    }
                 }
             }
         }

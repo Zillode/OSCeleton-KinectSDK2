@@ -4,7 +4,7 @@ OSCeleton-KinectSDK2
 What is this?
 -------------
 
-As the title says, it's just a small program that takes kinect
+As the title says, it's just a small program that takes Kinect
 skeleton data from the KinectSDK (v2) framework and spits out the coordinates
 of the skeleton's joints via OSC messages. These can can then be used
 on your language / framework of choice.
@@ -40,11 +40,29 @@ The messages will have the following format:
     s: Joint name, check out the full list of joints below
     i: The ID of the sensor
     i: The ID of the user
-    f: X coordinate of joint in real world coordinates (centimers)
-    f: Y coordinate of joint in real world coordinates (centimers)
-    f: Z coordinate of joint in real world coordinates (centimers)
+    f: X coordinate of joint in real world coordinates (centimetres)
+    f: Y coordinate of joint in real world coordinates (centimetres)
+    f: Z coordinate of joint in real world coordinates (centimetres)
     f: confidence value in interval [0.0, 1.0]
-	d: timestamp in milliseconds since Unix epoch
+	d: time stamp in milliseconds since Unix epoch
+
+Note: the Y coordinate is inverted compared to the default KinectSDK to be compatible with OpenNI.
+
+### Hand message - message with the coordinates of each hand:
+The messages will have the following format:
+
+    Address pattern: "/osceleton2/hand"
+    Type tag: "iiiffffifd"
+    i: The ID of the sensor
+    i: The ID of the user
+    i: The ID of the hand (1 == Left, 2 == Right)
+    f: X coordinate of joint in real world coordinates (centimetres)
+    f: Y coordinate of joint in real world coordinates (centimetres)
+    f: Z coordinate of joint in real world coordinates (centimetres)
+    f: confidence value in interval [0.0, 1.0]
+    i: state of the hand (1 == Open, 2 == Closed, 3 == Lasso, 4 == Unknown, 5 == NotTracked)
+    f: confidence value of the hand state in interval [0.0, 1.0]
+	d: time stamp in milliseconds since Unix epoch
 
 Note: the Y coordinate is inverted compared to the default KinectSDK to be compatible with OpenNI.
 
@@ -58,7 +76,7 @@ The messages will have the following format:
     f: pitch of the head [-90, 90]
     f: yaw of the head [-90, 90]
     f: roll of the head [-90, 90]
-	d: timestamp in milliseconds since Unix epoch
+	d: time stamp in milliseconds since Unix epoch
 	
 Further information about the FaceRotation properties can be found [here](https://msdn.microsoft.com/en-us/library/microsoft.kinect.face.faceframeresult.facerotationquaternion.aspx)
 
@@ -77,7 +95,7 @@ The messages will have the following format:
     f: mouth open [0, 1]
     f: mouth moved [0, 1]
     f: looking away [0, 1]
-	d: timestamp in milliseconds since Unix epoch
+	d: time stamp in milliseconds since Unix epoch
 
 Further information about the Face properties can be found [here](https://msdn.microsoft.com/en-us/library/microsoft.kinect.face.faceproperty.aspx)
 
