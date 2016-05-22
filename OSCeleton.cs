@@ -20,7 +20,7 @@ namespace OSCeleton
 
         // Settings
         private bool allUsers = true;
-        private bool handsOnly = true;
+        private bool handsOnly = false;
         private bool faceTracking = false;
         private bool writeOSC = true;
         private bool writeCSV = false;
